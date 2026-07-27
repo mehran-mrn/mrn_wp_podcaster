@@ -152,10 +152,20 @@ final class Player {
 					<button type="button" data-mrnp-skip="30" aria-label="<?php esc_attr_e( '۳۰ ثانیه جلو', 'mrn-podcaster' ); ?>"><span aria-hidden="true">↷</span><small>30</small></button>
 				</div>
 				<div class="mrnp-player__time" aria-live="off"><span data-mrnp-current>00:00</span><i>/</i><span data-mrnp-duration>00:00</span></div>
-				<div class="mrnp-player__options">
-					<label class="mrnp-player__source"><span><?php esc_html_e( 'منبع', 'mrn-podcaster' ); ?></span><select data-mrnp-source aria-label="<?php esc_attr_e( 'منبع صوت', 'mrn-podcaster' ); ?>"></select></label>
-					<button class="mrnp-player__speed" type="button" data-mrnp-speed value="1" aria-label="<?php esc_attr_e( 'تغییر سرعت پخش؛ سرعت فعلی یک برابر', 'mrn-podcaster' ); ?>"><span><?php esc_html_e( 'سرعت', 'mrn-podcaster' ); ?></span><strong data-mrnp-speed-value>1×</strong></button>
-					<label class="mrnp-player__volume"><span aria-hidden="true">◖</span><input data-mrnp-volume type="range" min="0" max="1" step=".05" value="1" aria-label="<?php esc_attr_e( 'صدا', 'mrn-podcaster' ); ?>"></label>
+					<div class="mrnp-player__options">
+						<label class="mrnp-player__source"><span><?php esc_html_e( 'منبع', 'mrn-podcaster' ); ?></span><select data-mrnp-source aria-label="<?php esc_attr_e( 'منبع صوت', 'mrn-podcaster' ); ?>"></select></label>
+						<label class="mrnp-player__speed">
+							<span><?php esc_html_e( 'سرعت', 'mrn-podcaster' ); ?></span>
+							<select data-mrnp-speed aria-label="<?php esc_attr_e( 'سرعت پخش', 'mrn-podcaster' ); ?>">
+								<option value="0.75">0.75×</option>
+								<option value="1" selected>1×</option>
+								<option value="1.25">1.25×</option>
+								<option value="1.5">1.5×</option>
+								<option value="1.75">1.75×</option>
+								<option value="2">2×</option>
+							</select>
+						</label>
+						<label class="mrnp-player__volume"><span aria-hidden="true">◖</span><input data-mrnp-volume type="range" min="0" max="1" step=".05" value="1" aria-label="<?php esc_attr_e( 'صدا', 'mrn-podcaster' ); ?>"></label>
 						<button class="mrnp-player__minimize" type="button" data-mrnp-minimize aria-label="<?php esc_attr_e( 'کوچک‌کردن پلیر', 'mrn-podcaster' ); ?>">
 							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
 					</button>

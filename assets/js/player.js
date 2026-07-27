@@ -22,10 +22,13 @@
 
     function show(nextIndex, smooth) {
       index = (nextIndex + items.length) % items.length;
-      items[index].scrollIntoView({
+      var trackRect = track.getBoundingClientRect();
+      var itemRect = items[index].getBoundingClientRect();
+      var horizontalDelta = itemRect.left - trackRect.left - ((trackRect.width - itemRect.width) / 2);
+      track.scrollBy({
         behavior: smooth ? 'smooth' : 'auto',
-        block: 'nearest',
-        inline: 'center'
+        left: horizontalDelta,
+        top: 0
       });
       updateCounter();
     }
@@ -99,7 +102,6 @@
   var miniTime = root.querySelector('[data-mrnp-mini-time]');
   var meta = root.querySelector('[data-mrnp-meta]');
   var cover = root.querySelector('[data-mrnp-cover]');
-  var speedValue = root.querySelector('[data-mrnp-speed-value]');
   var labels = window.mrnpPlayerConfig ? window.mrnpPlayerConfig.labels : {};
   var episode = null;
   var sourceNames = ['primary', 'backup', 'local'];
@@ -268,8 +270,7 @@
     var nextSpeed = Number(value);
     audio.playbackRate = speedValues.includes(nextSpeed) ? nextSpeed : 1;
     speed.value = String(audio.playbackRate);
-    speedValue.textContent = audio.playbackRate + '×';
-    speed.setAttribute('aria-label', 'تغییر سرعت پخش؛ سرعت فعلی ' + audio.playbackRate + ' برابر');
+    speed.setAttribute('aria-label', 'سرعت پخش؛ مقدار فعلی ' + audio.playbackRate + ' برابر');
     storageSet('mrnp-speed', String(audio.playbackRate));
   }
 
@@ -312,9 +313,8 @@
     }
   });
 
-  speed.addEventListener('click', function () {
-    var index = speedValues.indexOf(audio.playbackRate);
-    updateSpeed(speedValues[(index + 1) % speedValues.length]);
+  speed.addEventListener('change', function () {
+    updateSpeed(speed.value);
   });
 
   volume.addEventListener('input', function () {

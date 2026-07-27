@@ -66,8 +66,7 @@
   border-radius: 50%;
   box-shadow: 0 0 0 0.16rem rgb(217 155 67 / 18%);
   height: 0.68rem;
-  opacity: 0;
-  transition: opacity 140ms ease;
+  opacity: 1;
   width: 0.68rem;
 }
 
@@ -77,16 +76,8 @@
   border-radius: 50%;
   box-shadow: 0 0 0 0.16rem rgb(217 155 67 / 18%);
   height: 0.68rem;
-  opacity: 0;
-  transition: opacity 140ms ease;
-  width: 0.68rem;
-}
-
-.mrnp-player__progress:hover input::-webkit-slider-thumb,
-.mrnp-player__progress input:focus-visible::-webkit-slider-thumb,
-.mrnp-player__progress:hover input::-moz-range-thumb,
-.mrnp-player__progress input:focus-visible::-moz-range-thumb {
   opacity: 1;
+  width: 0.68rem;
 }
 
 .mrnp-player__main {
@@ -284,29 +275,58 @@
 }
 
 .mrnp-player__speed {
+  align-items: center;
   background: var(--mrnp-panel-soft) !important;
   border: 1px solid var(--mrnp-line) !important;
   border-radius: 999px !important;
   color: var(--mrnp-ink);
-  gap: 0.4rem;
+  display: inline-flex;
   flex: 0 0 auto;
-  height: 2.55rem;
-  min-width: 4.25rem;
-  padding-inline: 0.8rem;
-  position: static;
+  gap: 0.2rem;
+  height: 2.65rem;
+  isolation: isolate;
+  min-width: 7.2rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.25rem;
+  position: relative;
   width: auto;
+  z-index: 2;
 }
 
 .mrnp-player__speed > span {
   color: var(--mrnp-muted);
+  flex: 0 0 auto;
   font-size: 0.62rem;
 }
 
-.mrnp-player__speed > strong {
+.mrnp-player__options .mrnp-player__speed select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--mrnp-accent) 50%) 0.65rem calc(50% - 0.12rem) / 0.28rem 0.28rem no-repeat,
+    linear-gradient(135deg, var(--mrnp-accent) 50%, transparent 50%) 0.38rem calc(50% - 0.12rem) / 0.28rem 0.28rem no-repeat,
+    rgb(255 255 255 / 5%);
+  border: 0 !important;
+  border-radius: 999px;
+  box-shadow: none !important;
   color: var(--mrnp-accent-strong);
+  cursor: pointer;
   direction: ltr;
-  font-size: 0.7rem;
-  min-width: 2.2rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  height: 2.05rem;
+  margin: 0;
+  min-height: 0 !important;
+  min-width: 4.35rem;
+  padding: 0 0.45rem 0 1.15rem;
+  position: static;
+  text-align: center;
+  width: 4.35rem;
+}
+
+.mrnp-player__volume {
+  flex: 0 0 auto;
+  min-width: 5.3rem;
+  position: relative;
+  z-index: 1;
 }
 
 .mrnp-player__volume input {
@@ -785,7 +805,7 @@
 
   .mrnp-player__transport > button:not(.mrnp-player__play),
   .mrnp-player__time,
-  .mrnp-player__volume,
+  .mrnp-player__options .mrnp-player__volume,
   .mrnp-player__options > a {
     display: none;
   }
@@ -806,6 +826,11 @@
 
   .mrnp-player__options select {
     max-width: 7.4rem;
+  }
+
+  .mrnp-player__speed {
+    min-width: 4.85rem;
+    padding-inline: 0.25rem;
   }
 
   .mrnp-carousel__track {

@@ -4,7 +4,7 @@ Tags: podcast, rss, audio player, podcast import, media
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.2
+Stable tag: 0.2.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,17 @@ Yes. Enable the local audio archive setting. It is disabled by default because
 podcast media can consume substantial disk space.
 
 == Changelog ==
+
+= 0.2.5 =
+* Ensure the volume slider is removed from the compact mobile control row.
+
+= 0.2.4 =
+* Constrain carousel movement to its horizontal track so autoplay cannot move the page vertically.
+
+= 0.2.3 =
+* Keep the seek thumb visible throughout playback.
+* Replace click-to-cycle playback speed with a styled direct-selection menu.
+* Isolate speed and volume control layout at desktop and mobile widths.
 
 = 0.2.2 =
 * Keep minimized playback inside the current page and show its live timer.
