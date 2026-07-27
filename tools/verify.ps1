@@ -49,6 +49,14 @@ else {
 	Write-Host '[ ok ] Feed client tests' -ForegroundColor Green
 }
 
+& php (Join-Path $pluginRoot 'tests\test-comment-importer.php')
+if ($LASTEXITCODE -ne 0) {
+	$errors.Add('Comment importer tests failed.')
+}
+else {
+	Write-Host '[ ok ] Comment importer tests' -ForegroundColor Green
+}
+
 $forbidden = @(
 	'eval\s*\(',
 	'base64_decode\s*\(',

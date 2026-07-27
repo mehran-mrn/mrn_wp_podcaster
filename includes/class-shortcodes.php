@@ -154,15 +154,27 @@ final class Shortcodes {
 			return '';
 		}
 
+		Player::enqueue();
+		$total = count( $comments );
 		ob_start();
 		?>
-		<section class="mrnp-listeners">
-			<header><span aria-hidden="true">“</span><h2><?php echo esc_html( (string) $atts['heading'] ); ?></h2></header>
-			<div class="mrnp-listeners__grid">
-				<?php foreach ( $comments as $comment ) : ?>
-					<figure class="mrnp-listener">
-						<blockquote><?php echo wp_kses_post( wpautop( $comment->comment_content ) ); ?></blockquote>
-						<figcaption>
+			<section class="mrnp-listeners" data-mrnp-listeners aria-roledescription="<?php esc_attr_e( 'چرخ‌وفلک دیدگاه شنوندگان', 'mrn-podcaster' ); ?>">
+				<header>
+					<div class="mrnp-listeners__title"><span aria-hidden="true">“</span><h2><?php echo esc_html( (string) $atts['heading'] ); ?></h2></div>
+					<?php if ( $total > 1 ) : ?>
+						<div class="mrnp-listeners__controls">
+							<button type="button" data-mrnp-listeners-prev aria-label="<?php esc_attr_e( 'دیدگاه قبلی', 'mrn-podcaster' ); ?>">→</button>
+							<output data-mrnp-listeners-counter aria-live="polite">1 / <?php echo esc_html( (string) $total ); ?></output>
+							<button type="button" data-mrnp-listeners-next aria-label="<?php esc_attr_e( 'دیدگاه بعدی', 'mrn-podcaster' ); ?>">←</button>
+						</div>
+					<?php endif; ?>
+				</header>
+				<div class="mrnp-listeners__viewport">
+					<div class="mrnp-listeners__track" data-mrnp-listeners-track>
+					<?php foreach ( $comments as $comment ) : ?>
+						<figure class="mrnp-listener" tabindex="-1">
+							<blockquote><?php echo wp_kses_post( wpautop( $comment->comment_content ) ); ?></blockquote>
+							<figcaption>
 							<strong><?php echo esc_html( $comment->comment_author ); ?></strong>
 							<a href="<?php echo esc_url( get_comment_link( $comment ) ); ?>"><?php echo esc_html( get_the_title( $comment->comment_post_ID ) ); ?></a>
 							<?php $source = get_comment_meta( $comment->comment_ID, '_mrnp_external_source', true ); ?>
@@ -170,11 +182,12 @@ final class Shortcodes {
 							if ( $source ) :
 								?>
 								<small><?php echo esc_html( $source ); ?></small><?php endif; ?>
-						</figcaption>
-					</figure>
-				<?php endforeach; ?>
-			</div>
-		</section>
+							</figcaption>
+						</figure>
+					<?php endforeach; ?>
+					</div>
+				</div>
+			</section>
 		<?php
 		return (string) ob_get_clean();
 	}
