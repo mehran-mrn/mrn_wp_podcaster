@@ -4,7 +4,7 @@ Tags: podcast, rss, audio player, podcast import, media
 Requires at least: 6.6
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 0.2.5
+Stable tag: 0.2.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,9 @@ Yes. Enable the local audio archive setting. It is disabled by default because
 podcast media can consume substantial disk space.
 
 == Changelog ==
+
+= 0.2.6 =
+* Fix the admin sidebar gap and page-level horizontal overflow in RTL and LTR layouts.
 
 = 0.2.5 =
 * Ensure the volume slider is removed from the compact mobile control row.
