@@ -134,8 +134,8 @@ final class Player {
 		?>
 		<section class="mrnp-player<?php echo $data ? ' is-ready' : ''; ?>" data-mrnp-player data-initial="<?php echo esc_attr( wp_json_encode( $data ) ); ?>" aria-label="<?php esc_attr_e( 'پلیر پادکست', 'mrn-podcaster' ); ?>">
 			<audio data-mrnp-audio preload="metadata"></audio>
-			<div class="mrnp-player__progress">
-				<input data-mrnp-seek type="range" min="0" max="1000" value="0" aria-label="<?php esc_attr_e( 'موقعیت پخش', 'mrn-podcaster' ); ?>">
+			<div class="mrnp-player__progress" dir="ltr">
+				<input data-mrnp-seek type="range" min="0" max="1000" value="0" dir="ltr" aria-label="<?php esc_attr_e( 'موقعیت پخش', 'mrn-podcaster' ); ?>">
 			</div>
 			<div class="mrnp-player__main">
 				<img class="mrnp-player__cover" data-mrnp-cover src="" alt="" width="64" height="64">
@@ -152,16 +152,36 @@ final class Player {
 					<button type="button" data-mrnp-skip="30" aria-label="<?php esc_attr_e( '۳۰ ثانیه جلو', 'mrn-podcaster' ); ?>"><span aria-hidden="true">↷</span><small>30</small></button>
 				</div>
 				<div class="mrnp-player__time" aria-live="off"><span data-mrnp-current>00:00</span><i>/</i><span data-mrnp-duration>00:00</span></div>
-				<div class="mrnp-player__options">
-					<label class="mrnp-player__source"><span><?php esc_html_e( 'منبع', 'mrn-podcaster' ); ?></span><select data-mrnp-source aria-label="<?php esc_attr_e( 'منبع صوت', 'mrn-podcaster' ); ?>"></select></label>
-					<label class="mrnp-player__speed"><span><?php esc_html_e( 'سرعت', 'mrn-podcaster' ); ?></span><select data-mrnp-speed aria-label="<?php esc_attr_e( 'سرعت پخش', 'mrn-podcaster' ); ?>"><option value=".75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="1.75">1.75×</option><option value="2">2×</option></select></label>
-					<label class="mrnp-player__volume"><span aria-hidden="true">◖</span><input data-mrnp-volume type="range" min="0" max="1" step=".05" value="1" aria-label="<?php esc_attr_e( 'صدا', 'mrn-podcaster' ); ?>"></label>
-					<a data-mrnp-download href="#" download aria-label="<?php esc_attr_e( 'دریافت فایل صوتی', 'mrn-podcaster' ); ?>">↓</a>
-					<button type="button" data-mrnp-minimize aria-label="<?php esc_attr_e( 'کوچک‌کردن پلیر', 'mrn-podcaster' ); ?>">⌄</button>
-					<button type="button" data-mrnp-close aria-label="<?php esc_attr_e( 'بستن پلیر', 'mrn-podcaster' ); ?>">×</button>
+					<div class="mrnp-player__options">
+						<label class="mrnp-player__source"><span><?php esc_html_e( 'منبع', 'mrn-podcaster' ); ?></span><select data-mrnp-source aria-label="<?php esc_attr_e( 'منبع صوت', 'mrn-podcaster' ); ?>"></select></label>
+						<label class="mrnp-player__speed">
+							<span><?php esc_html_e( 'سرعت', 'mrn-podcaster' ); ?></span>
+							<select data-mrnp-speed aria-label="<?php esc_attr_e( 'سرعت پخش', 'mrn-podcaster' ); ?>">
+								<option value="0.75">0.75×</option>
+								<option value="1" selected>1×</option>
+								<option value="1.25">1.25×</option>
+								<option value="1.5">1.5×</option>
+								<option value="1.75">1.75×</option>
+								<option value="2">2×</option>
+							</select>
+						</label>
+						<label class="mrnp-player__volume"><span aria-hidden="true">◖</span><input data-mrnp-volume type="range" min="0" max="1" step=".05" value="1" aria-label="<?php esc_attr_e( 'صدا', 'mrn-podcaster' ); ?>"></label>
+						<button class="mrnp-player__minimize" type="button" data-mrnp-minimize aria-label="<?php esc_attr_e( 'کوچک‌کردن پلیر', 'mrn-podcaster' ); ?>">
+							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+					</button>
+					<button class="mrnp-player__close" type="button" data-mrnp-close aria-label="<?php esc_attr_e( 'بستن پلیر', 'mrn-podcaster' ); ?>">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+					</button>
 				</div>
 			</div>
-			<button class="mrnp-player__mini" type="button" data-mrnp-expand aria-label="<?php esc_attr_e( 'بازکردن پلیر', 'mrn-podcaster' ); ?>"><span class="mrnp-player__mini-bars" aria-hidden="true"><i></i><i></i><i></i></span><strong data-mrnp-mini-title><?php esc_html_e( 'پادکست', 'mrn-podcaster' ); ?></strong></button>
+				<button class="mrnp-player__mini" type="button" data-mrnp-expand aria-label="<?php esc_attr_e( 'بازکردن پلیر', 'mrn-podcaster' ); ?>">
+					<span class="mrnp-player__mini-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+					<span class="mrnp-player__mini-copy">
+						<strong data-mrnp-mini-title><?php esc_html_e( 'پادکست', 'mrn-podcaster' ); ?></strong>
+						<small data-mrnp-mini-time dir="ltr">00:00 / 00:00</small>
+					</span>
+					<svg class="mrnp-player__mini-expand" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>
+				</button>
 		</section>
 		<?php
 	}

@@ -10,7 +10,7 @@
 
 .mrnp-player {
   background: linear-gradient(135deg, #06272a, var(--mrnp-panel));
-  border-block-start: 1px solid rgb(217 155 67 / 70%);
+  border-block-start: 0;
   bottom: 0;
   box-shadow: 0 -1rem 3rem rgb(0 0 0 / 24%);
   color: var(--mrnp-ink);
@@ -30,21 +30,54 @@
 }
 
 .mrnp-player__progress {
-  height: 0;
-  inset-block-start: 0;
-  inset-inline: 0;
-  position: absolute;
+  align-items: stretch;
+  background: transparent;
+  direction: ltr;
+  display: flex;
+  height: 3px;
+  padding: 0;
+  position: relative;
 }
 
 .mrnp-player__progress input {
-  accent-color: var(--mrnp-accent);
+  --mrnp-progress: 0%;
+
+  appearance: none;
+  background: linear-gradient(to right, var(--mrnp-accent-strong) 0 var(--mrnp-progress), rgb(217 155 67 / 18%) var(--mrnp-progress) 100%);
+  border: 0 !important;
+  border-radius: 999px;
+  box-shadow: none !important;
+  box-sizing: border-box;
   cursor: pointer;
-  height: 0.35rem;
-  inset-block-start: -0.2rem;
+  direction: ltr;
+  height: 3px !important;
   margin: 0;
-  padding: 0;
-  position: absolute;
+  min-height: 0 !important;
+  padding: 0 !important;
+  position: relative;
   width: 100%;
+  z-index: 1;
+}
+
+.mrnp-player__progress input::-webkit-slider-thumb {
+  appearance: none;
+  background: var(--mrnp-accent-strong);
+  border: 1px solid var(--mrnp-panel);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.16rem rgb(217 155 67 / 18%);
+  height: 0.68rem;
+  opacity: 1;
+  width: 0.68rem;
+}
+
+.mrnp-player__progress input::-moz-range-thumb {
+  background: var(--mrnp-accent-strong);
+  border: 1px solid var(--mrnp-panel);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.16rem rgb(217 155 67 / 18%);
+  height: 0.68rem;
+  opacity: 1;
+  width: 0.68rem;
 }
 
 .mrnp-player__main {
@@ -109,14 +142,17 @@
   align-items: center;
   direction: ltr;
   display: flex;
-  gap: 0.25rem;
+  gap: 0.65rem;
 }
 
 .mrnp-player__transport > button:not(.mrnp-player__play) {
+  background: rgb(255 255 255 / 6%);
+  border: 1px solid var(--mrnp-line);
   border-radius: 50%;
-  height: 2.35rem;
+  height: 2.75rem;
   position: relative;
-  width: 2.35rem;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+  width: 2.75rem;
 }
 
 .mrnp-player__transport > button:not(.mrnp-player__play):hover,
@@ -125,15 +161,21 @@
   background: rgb(255 255 255 / 10%);
 }
 
+.mrnp-player__transport > button:not(.mrnp-player__play):hover {
+  border-color: rgb(217 155 67 / 62%);
+  transform: translateY(-0.08rem);
+}
+
 .mrnp-player__transport small {
-  font-size: 0.52rem;
+  font-size: 0.58rem;
+  font-weight: 800;
   inset: 50% auto auto 50%;
   position: absolute;
   transform: translate(-50%, -40%);
 }
 
 .mrnp-player__transport > button > span {
-  font-size: 1.65rem;
+  font-size: 1.8rem;
   line-height: 1;
 }
 
@@ -165,6 +207,20 @@
   display: block;
 }
 
+.mrnp-player.is-loading .mrnp-player__play svg {
+  display: none !important;
+}
+
+.mrnp-player.is-loading .mrnp-player__play::after {
+  animation: mrnp-spin 700ms linear infinite;
+  border: 2px solid rgb(6 39 42 / 30%);
+  border-radius: 50%;
+  border-top-color: #06272a;
+  content: "";
+  height: 1.15rem;
+  width: 1.15rem;
+}
+
 .mrnp-player__time {
   color: var(--mrnp-muted);
   direction: ltr;
@@ -181,8 +237,10 @@
 .mrnp-player__options {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.45rem;
   justify-content: flex-end;
+  min-width: 0;
 }
 
 .mrnp-player__options label {
@@ -197,15 +255,78 @@
 }
 
 .mrnp-player__options select {
-  appearance: auto;
+  appearance: none;
   background: var(--mrnp-panel-soft);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--mrnp-accent) 50%),
+    linear-gradient(135deg, var(--mrnp-accent) 50%, transparent 50%);
+  background-position:
+    calc(0.8rem) calc(50% - 0.12rem),
+    calc(0.5rem) calc(50% - 0.12rem);
+  background-repeat: no-repeat;
+  background-size: 0.3rem 0.3rem, 0.3rem 0.3rem;
   border: 1px solid var(--mrnp-line);
-  border-radius: 0.45rem;
+  border-radius: 999px;
   color: var(--mrnp-ink);
   font-size: 0.67rem;
-  height: 2rem;
+  height: 2.25rem;
   max-width: 8rem;
-  padding: 0 0.35rem;
+  padding: 0 0.75rem 0 1.35rem;
+}
+
+.mrnp-player__speed {
+  align-items: center;
+  background: var(--mrnp-panel-soft) !important;
+  border: 1px solid var(--mrnp-line) !important;
+  border-radius: 999px !important;
+  color: var(--mrnp-ink);
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 0.2rem;
+  height: 2.65rem;
+  isolation: isolate;
+  min-width: 7.2rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.25rem;
+  position: relative;
+  width: auto;
+  z-index: 2;
+}
+
+.mrnp-player__speed > span {
+  color: var(--mrnp-muted);
+  flex: 0 0 auto;
+  font-size: 0.62rem;
+}
+
+.mrnp-player__options .mrnp-player__speed select {
+  appearance: none;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--mrnp-accent) 50%) 0.65rem calc(50% - 0.12rem) / 0.28rem 0.28rem no-repeat,
+    linear-gradient(135deg, var(--mrnp-accent) 50%, transparent 50%) 0.38rem calc(50% - 0.12rem) / 0.28rem 0.28rem no-repeat,
+    rgb(255 255 255 / 5%);
+  border: 0 !important;
+  border-radius: 999px;
+  box-shadow: none !important;
+  color: var(--mrnp-accent-strong);
+  cursor: pointer;
+  direction: ltr;
+  font-size: 0.72rem;
+  font-weight: 800;
+  height: 2.05rem;
+  margin: 0;
+  min-height: 0 !important;
+  min-width: 4.35rem;
+  padding: 0 0.45rem 0 1.15rem;
+  position: static;
+  text-align: center;
+  width: 4.35rem;
+}
+
+.mrnp-player__volume {
+  flex: 0 0 auto;
+  min-width: 5.3rem;
+  position: relative;
+  z-index: 1;
 }
 
 .mrnp-player__volume input {
@@ -213,12 +334,35 @@
   width: 4.5rem;
 }
 
-.mrnp-player__options > button,
+.mrnp-player__options > button:not(.mrnp-player__speed),
 .mrnp-player__options > a {
+  border: 1px solid var(--mrnp-line);
   border-radius: 50%;
   font-size: 1.1rem;
-  height: 2rem;
-  width: 2rem;
+  height: 2.8rem;
+  transition: background 160ms ease, border-color 160ms ease;
+  width: 2.8rem;
+}
+
+.mrnp-player__options > button svg {
+  fill: none;
+  height: 1.35rem;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 1.35rem;
+}
+
+.mrnp-player__close {
+  background: rgb(184 65 65 / 10%) !important;
+  border-color: rgb(255 134 134 / 28%) !important;
+  color: #ffc6c6 !important;
+}
+
+.mrnp-player__close:hover {
+  background: rgb(184 65 65 / 28%) !important;
+  border-color: rgb(255 134 134 / 52%) !important;
 }
 
 .mrnp-player__mini {
@@ -228,18 +372,44 @@
   bottom: 0.8rem;
   box-shadow: 0 0.6rem 2rem rgb(0 0 0 / 25%);
   display: none !important;
-  gap: 0.55rem;
+  gap: 0.7rem;
   inset-inline-end: 1rem;
   max-width: min(18rem, calc(100vw - 2rem));
-  padding: 0.6rem 0.9rem !important;
+  padding: 0.68rem 0.9rem !important;
   position: fixed;
 }
 
+.mrnp-player__mini-copy {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+  text-align: start;
+}
+
 .mrnp-player__mini strong {
+  display: block;
   font-size: 0.72rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mrnp-player__mini-copy small {
+  color: var(--mrnp-accent-strong);
+  direction: ltr;
+  font-size: 0.66rem;
+  justify-self: start;
+}
+
+.mrnp-player__mini-expand {
+  fill: none;
+  flex: 0 0 auto;
+  height: 1.15rem;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 1.15rem;
 }
 
 .mrnp-player__mini-bars {
@@ -353,8 +523,12 @@
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   padding-block-end: 0.6rem;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   scroll-snap-type: inline mandatory;
+}
+
+.mrnp-carousel__track::-webkit-scrollbar {
+  display: none;
 }
 
 .mrnp-episode-card {
@@ -453,20 +627,66 @@
 .mrnp-listeners > header {
   align-items: center;
   display: flex;
-  gap: 0.6rem;
+  justify-content: space-between;
   margin-block-end: 1rem;
 }
 
-.mrnp-listeners > header > span {
+.mrnp-listeners__title {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.mrnp-listeners__title > span {
   color: var(--mrnp-accent);
   font-size: 2.4rem;
   line-height: 0.6;
 }
 
-.mrnp-listeners__grid {
+.mrnp-listeners__controls {
+  align-items: center;
+  direction: rtl;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mrnp-listeners__controls button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--mrnp-card-border, rgb(0 0 0 / 15%));
+  border-radius: 50%;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.mrnp-listeners__controls output {
+  direction: ltr;
+  font-size: 0.66rem;
+  min-width: 2.5rem;
+  opacity: 0.65;
+  text-align: center;
+}
+
+.mrnp-listeners__viewport {
+  overflow: hidden;
+}
+
+.mrnp-listeners__track {
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  scroll-snap-type: inline mandatory;
+}
+
+.mrnp-listeners__track::-webkit-scrollbar {
+  display: none;
 }
 
 .mrnp-listener {
@@ -475,6 +695,8 @@
   border-radius: 1rem;
   margin: 0;
   padding: 1rem;
+  scroll-snap-align: center;
+  width: 100%;
 }
 
 .mrnp-listener blockquote,
@@ -540,6 +762,10 @@
   to { height: 100%; }
 }
 
+@keyframes mrnp-spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 64rem) {
   .mrnp-player__main {
     grid-template-columns: 3.3rem minmax(8rem, 1fr) auto auto;
@@ -579,7 +805,7 @@
 
   .mrnp-player__transport > button:not(.mrnp-player__play),
   .mrnp-player__time,
-  .mrnp-player__volume,
+  .mrnp-player__options .mrnp-player__volume,
   .mrnp-player__options > a {
     display: none;
   }
@@ -602,6 +828,11 @@
     max-width: 7.4rem;
   }
 
+  .mrnp-player__speed {
+    min-width: 4.85rem;
+    padding-inline: 0.25rem;
+  }
+
   .mrnp-carousel__track {
     grid-auto-columns: minmax(14.5rem, 82%);
   }
@@ -614,7 +845,8 @@
 @media (prefers-reduced-motion: reduce) {
   .mrnp-player,
   .mrnp-player *,
-  .mrnp-carousel__track {
+  .mrnp-carousel__track,
+  .mrnp-listeners__track {
     animation-duration: 0.01ms !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;

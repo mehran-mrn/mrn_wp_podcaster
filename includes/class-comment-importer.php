@@ -140,7 +140,10 @@ final class Comment_Importer {
 				'timeout'             => 12,
 				'redirection'         => 2,
 				'limit_response_size' => 2 * MB_IN_BYTES,
-				'user-agent'          => 'Mozilla/5.0 (compatible; MRN-Podcaster/' . MRNP_VERSION . ')',
+				'user-agent'          => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 MRN-Podcaster/' . MRNP_VERSION,
+				'headers'             => array(
+					'Accept-Language' => 'fa,en-US;q=0.9,en;q=0.8',
+				),
 			)
 		);
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
@@ -157,6 +160,10 @@ final class Comment_Importer {
 		}
 
 		$comments = array();
+		$host     = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+		if ( 'castbox.fm' === $host || str_ends_with( $host, '.castbox.fm' ) ) {
+			$comments = array_merge( $comments, $this->parse_castbox_comments( $document, $name ? $name : 'Castbox' ) );
+		}
 		foreach ( $document->getElementsByTagName( 'script' ) as $script ) {
 			if ( 'application/ld+json' !== strtolower( trim( $script->getAttribute( 'type' ) ) ) ) {
 				continue;
@@ -167,6 +174,52 @@ final class Comment_Importer {
 			}
 		}
 		return array_slice( $comments, 0, 100 );
+	}
+
+	/**
+	 * Extract public Castbox channel and episode comments from its server
+	 * rendered HTML. Castbox omits these nodes for crawler-like user agents,
+	 * which is why the request above intentionally uses a regular browser UA.
+	 *
+	 * @param \DOMDocument $document Parsed Castbox page.
+	 * @param string       $source Source label.
+	 * @return array<int, array<string, string>>
+	 */
+	private function parse_castbox_comments( \DOMDocument $document, string $source ): array {
+		$xpath = new \DOMXPath( $document );
+		$nodes = $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " commentItem ")]' );
+		if ( false === $nodes ) {
+			return array();
+		}
+
+		$comments = array();
+		foreach ( $nodes as $node ) {
+			if ( count( $comments ) >= 100 ) {
+				break;
+			}
+
+			$text_node   = $xpath->query( './/*[contains(concat(" ", normalize-space(@class), " "), " commentItemDes ")]', $node );
+			$author_node = $xpath->query( './/*[contains(concat(" ", normalize-space(@class), " "), " username ")]', $node );
+			$date_node   = $xpath->query( './/*[contains(concat(" ", normalize-space(@class), " "), " commentItemDate ")]', $node );
+			$text        = false !== $text_node && $text_node->length ? trim( (string) $text_node->item( 0 )->textContent ) : ''; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Native DOM property.
+			if ( '' === $text ) {
+				continue;
+			}
+
+			$id         = false !== $text_node && $text_node->length ? (string) $text_node->item( 0 )->getAttribute( 'data-id' ) : '';
+			$author     = false !== $author_node && $author_node->length ? trim( (string) $author_node->item( 0 )->textContent ) : ''; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Native DOM property.
+			$date       = false !== $date_node && $date_node->length ? trim( (string) $date_node->item( 0 )->textContent ) : ''; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Native DOM property.
+			$comments[] = array(
+				'id'         => $id ? $id : hash( 'sha256', $source . '|' . $author . '|' . $text ),
+				'author'     => $author ? sanitize_text_field( $author ) : __( 'شنونده Castbox', 'mrn-podcaster' ),
+				'author_url' => '',
+				'text'       => wp_kses_post( $text ),
+				'date'       => sanitize_text_field( $date ),
+				'source'     => $source ? $source : 'Castbox',
+			);
+		}
+
+		return $comments;
 	}
 
 	/**

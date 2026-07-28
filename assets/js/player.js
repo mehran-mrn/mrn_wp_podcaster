@@ -1,6 +1,89 @@
 (function () {
   'use strict';
 
+  function initializeScrollCarousel(container, options) {
+    var track = container.querySelector(options.track);
+    var items = track ? Array.from(track.querySelectorAll(options.item)) : [];
+    var next = container.querySelector(options.next);
+    var prev = container.querySelector(options.prev);
+    var counter = container.querySelector(options.counter || '[data-unused-counter]');
+    var index = 0;
+    var timer = null;
+
+    if (!track || items.length < 1) {
+      return;
+    }
+
+    function updateCounter() {
+      if (counter) {
+        counter.textContent = (index + 1) + ' / ' + items.length;
+      }
+    }
+
+    function show(nextIndex, smooth) {
+      index = (nextIndex + items.length) % items.length;
+      var trackRect = track.getBoundingClientRect();
+      var itemRect = items[index].getBoundingClientRect();
+      var horizontalDelta = itemRect.left - trackRect.left - ((trackRect.width - itemRect.width) / 2);
+      track.scrollBy({
+        behavior: smooth ? 'smooth' : 'auto',
+        left: horizontalDelta,
+        top: 0
+      });
+      updateCounter();
+    }
+
+    function startAutoPlay() {
+      if (!options.autoPlay || items.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+      window.clearInterval(timer);
+      timer = window.setInterval(function () {
+        show(index + 1, true);
+      }, 6500);
+    }
+
+    if (next) {
+      next.addEventListener('click', function () {
+        show(index + 1, true);
+        startAutoPlay();
+      });
+    }
+    if (prev) {
+      prev.addEventListener('click', function () {
+        show(index - 1, true);
+        startAutoPlay();
+      });
+    }
+    container.addEventListener('mouseenter', function () { window.clearInterval(timer); });
+    container.addEventListener('mouseleave', startAutoPlay);
+    container.addEventListener('focusin', function () { window.clearInterval(timer); });
+    container.addEventListener('focusout', startAutoPlay);
+    updateCounter();
+    startAutoPlay();
+  }
+
+  document.querySelectorAll('[data-mrnp-carousel]').forEach(function (carousel) {
+    initializeScrollCarousel(carousel, {
+      track: '[data-mrnp-carousel-track]',
+      item: '.mrnp-episode-card',
+      next: '[data-mrnp-carousel-next]',
+      prev: '[data-mrnp-carousel-prev]',
+      autoPlay: false
+    });
+  });
+
+  document.querySelectorAll('[data-mrnp-listeners]').forEach(function (carousel) {
+    initializeScrollCarousel(carousel, {
+      track: '[data-mrnp-listeners-track]',
+      item: '.mrnp-listener',
+      next: '[data-mrnp-listeners-next]',
+      prev: '[data-mrnp-listeners-prev]',
+      counter: '[data-mrnp-listeners-counter]',
+      autoPlay: true
+    });
+  });
+
   var root = document.querySelector('[data-mrnp-player]');
   if (!root) {
     return;
@@ -16,14 +99,16 @@
   var source = root.querySelector('[data-mrnp-source]');
   var title = root.querySelector('[data-mrnp-title]');
   var miniTitle = root.querySelector('[data-mrnp-mini-title]');
+  var miniTime = root.querySelector('[data-mrnp-mini-time]');
   var meta = root.querySelector('[data-mrnp-meta]');
   var cover = root.querySelector('[data-mrnp-cover]');
-  var download = root.querySelector('[data-mrnp-download]');
   var labels = window.mrnpPlayerConfig ? window.mrnpPlayerConfig.labels : {};
   var episode = null;
   var sourceNames = ['primary', 'backup', 'local'];
+  var speedValues = [0.75, 1, 1.25, 1.5, 1.75, 2];
   var lastSave = 0;
   var switching = false;
+  var playRequested = false;
 
   function storageGet(key) {
     try {
@@ -117,12 +202,9 @@
     switching = true;
     source.value = name;
     audio.src = episode.sources[name];
-    download.href = episode.sources[name];
     audio.load();
     if (shouldPlay) {
-      audio.play().catch(function () {
-        updatePlayingState();
-      });
+      requestPlay();
     }
     audio.addEventListener('loadedmetadata', function loaded() {
       audio.removeEventListener('loadedmetadata', loaded);
@@ -141,7 +223,7 @@
     }
     if (episode && episode.id === nextEpisode.id) {
       if (shouldPlay) {
-        audio.paused ? audio.play() : audio.pause();
+        audio.paused ? requestPlay() : audio.pause();
       }
       return;
     }
@@ -174,6 +256,24 @@
     }
   }
 
+  function requestPlay() {
+    playRequested = true;
+    root.classList.add('is-loading');
+    audio.play().catch(function () {
+      playRequested = false;
+      root.classList.remove('is-loading');
+      updatePlayingState();
+    });
+  }
+
+  function updateSpeed(value) {
+    var nextSpeed = Number(value);
+    audio.playbackRate = speedValues.includes(nextSpeed) ? nextSpeed : 1;
+    speed.value = String(audio.playbackRate);
+    speed.setAttribute('aria-label', 'سرعت پخش؛ مقدار فعلی ' + audio.playbackRate + ' برابر');
+    storageSet('mrnp-speed', String(audio.playbackRate));
+  }
+
   function skip(seconds) {
     audio.currentTime = Math.max(0, Math.min(audio.duration || Infinity, audio.currentTime + seconds));
   }
@@ -189,6 +289,8 @@
       loadSource(next, true, true);
       return;
     }
+    playRequested = false;
+    root.classList.remove('is-loading');
     meta.textContent = labels.unavailable || 'Audio unavailable';
   }
 
@@ -196,7 +298,7 @@
     if (!episode) {
       return;
     }
-    audio.paused ? audio.play() : audio.pause();
+    audio.paused ? requestPlay() : audio.pause();
   });
 
   root.querySelectorAll('[data-mrnp-skip]').forEach(function (button) {
@@ -212,8 +314,7 @@
   });
 
   speed.addEventListener('change', function () {
-    audio.playbackRate = Number(speed.value);
-    storageSet('mrnp-speed', speed.value);
+    updateSpeed(speed.value);
   });
 
   volume.addEventListener('input', function () {
@@ -236,13 +337,39 @@
   });
 
   root.querySelector('[data-mrnp-close]').addEventListener('click', function () {
+    playRequested = false;
     audio.pause();
+    root.classList.remove('is-loading');
     root.classList.add('is-closed');
     document.body.classList.remove('mrnp-player-active');
   });
 
   audio.addEventListener('play', updatePlayingState);
-  audio.addEventListener('pause', updatePlayingState);
+  audio.addEventListener('pause', function () {
+    playRequested = false;
+    root.classList.remove('is-loading');
+    updatePlayingState();
+  });
+  audio.addEventListener('playing', function () {
+    playRequested = false;
+    root.classList.remove('is-loading');
+    updatePlayingState();
+  });
+  audio.addEventListener('waiting', function () {
+    if (playRequested || !audio.paused) {
+      root.classList.add('is-loading');
+    }
+  });
+  audio.addEventListener('stalled', function () {
+    if (playRequested || !audio.paused) {
+      root.classList.add('is-loading');
+    }
+  });
+  audio.addEventListener('canplay', function () {
+    if (!playRequested) {
+      root.classList.remove('is-loading');
+    }
+  });
   audio.addEventListener('ended', function () {
     if (episode) {
       storageSet('mrnp-progress-' + episode.id, '0');
@@ -252,11 +379,14 @@
   audio.addEventListener('error', tryNextSource);
   audio.addEventListener('loadedmetadata', function () {
     duration.textContent = formatTime(audio.duration);
+    miniTime.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
   });
   audio.addEventListener('timeupdate', function () {
     current.textContent = formatTime(audio.currentTime);
+    miniTime.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
     if (Number.isFinite(audio.duration) && audio.duration > 0) {
       seek.value = String(Math.round((audio.currentTime / audio.duration) * 1000));
+      seek.style.setProperty('--mrnp-progress', (Number(seek.value) / 10) + '%');
     }
     if (Date.now() - lastSave > 5000) {
       lastSave = Date.now();
@@ -273,21 +403,6 @@
       setEpisode(JSON.parse(button.dataset.mrnpPlay), true);
     } catch (error) {
       // Ignore malformed third-party markup.
-    }
-  });
-
-  document.querySelectorAll('[data-mrnp-carousel]').forEach(function (carousel) {
-    var track = carousel.querySelector('[data-mrnp-carousel-track]');
-    var next = carousel.querySelector('[data-mrnp-carousel-next]');
-    var prev = carousel.querySelector('[data-mrnp-carousel-prev]');
-    function move(direction) {
-      track.scrollBy({ left: direction * Math.max(280, track.clientWidth * 0.72), behavior: 'smooth' });
-    }
-    if (next) {
-      next.addEventListener('click', function () { move(1); });
-    }
-    if (prev) {
-      prev.addEventListener('click', function () { move(-1); });
     }
   });
 
@@ -308,8 +423,9 @@
   var storedSpeed = parseFloat(storageGet('mrnp-speed'));
   var storedVolume = parseFloat(storageGet('mrnp-volume'));
   if (Number.isFinite(storedSpeed)) {
-    audio.playbackRate = storedSpeed;
-    speed.value = String(storedSpeed);
+    updateSpeed(storedSpeed);
+  } else {
+    updateSpeed(1);
   }
   if (Number.isFinite(storedVolume)) {
     audio.volume = storedVolume;

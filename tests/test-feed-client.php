@@ -6,7 +6,7 @@
  */
 
 define( 'ABSPATH', __DIR__ );
-define( 'MRNP_VERSION', '0.1.2' );
+define( 'MRNP_VERSION', '0.2.5' );
 define( 'HOUR_IN_SECONDS', 3600 );
 define( 'MINUTE_IN_SECONDS', 60 );
 

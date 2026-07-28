@@ -18,12 +18,12 @@ and provides a persistent, theme-independent audio player.
 - WP-Cron synchronization every 15 minutes, hourly, twice daily or daily, with
   an overlap lock and persistent operational logs.
 - Pending-by-default episode and show-level comment import with global hash
-  deduplication. Standard RSS comment feeds and public Schema.org Review/Comment
-  data on configured platform pages are discovered without publishing
+  deduplication. Standard RSS comment feeds, public Schema.org Review/Comment
+  data and public Castbox channel comments are discovered without publishing
   automatically.
 - A bottom player with speed, seek, volume, source switching, automatic
-  fallback, progress memory, minimized mode, download and Media Session API
-  controls for background/lock-screen playback.
+  fallback, progress memory, an in-page minimized timer, loading feedback and
+  Media Session API controls.
 - Shortcodes for episode carousels, approved listener comments and play buttons.
 - A protected Persian administration dashboard and explicit uninstall policy.
 
@@ -41,7 +41,7 @@ PHP 8.1+ and WordPress 6.6+ are required.
 
 ```text
 [mrnp_episode_carousel count="8" heading="آخرین اپیزودها"]
-[mrnp_listener_comments count="3" heading="از شنوندگان"]
+[mrnp_listener_comments count="8" heading="از شنوندگان"]
 [mrnp_player id="123"]
 ```
 
@@ -51,9 +51,10 @@ own layout.
 
 ## Comment provider contract
 
-RSS inline comments and standard RSS comment-feed links are built in. Podcast
-platforms differ widely and many do not offer a public comments API. Provider
-adapters can safely add results without scraping core code:
+RSS inline comments, standard RSS comment-feed links, Schema.org reviews and
+Castbox's publicly rendered channel comments are built in. Podcast platforms
+differ widely and many do not offer a public comments API. Provider adapters
+can safely add results without changing core synchronization:
 
 ```php
 add_filter(

@@ -3,7 +3,7 @@
  * Plugin Name:       MRN Podcaster
  * Plugin URI:        https://github.com/mehran-mrn/mrn_wp_podcaster
  * Description:       همگام‌سازی حرفه‌ای فید پادکست، آرشیو اپیزودها، نظرات شنوندگان و پلیر سراسری.
- * Version:           0.1.2
+ * Version:           0.2.5
  * Requires at least: 6.6
  * Requires PHP:      8.1
  * Author:            MRN
@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MRNP_VERSION', '0.1.2' );
+define( 'MRNP_VERSION', '0.2.5' );
 define( 'MRNP_FILE', __FILE__ );
 define( 'MRNP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MRNP_URL', plugin_dir_url( __FILE__ ) );
