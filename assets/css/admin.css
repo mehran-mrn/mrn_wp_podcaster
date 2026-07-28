@@ -10,7 +10,10 @@
   --mrnp-admin-line: #dedbd2;
   color: var(--mrnp-admin-ink);
   font-family: Vazirmatn, Tahoma, sans-serif;
-  margin: 0 0 0 -20px;
+  margin: 0;
+  margin-inline-start: -20px;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 .mrnp-admin * {
@@ -146,6 +149,7 @@
 .mrnp-admin__content {
   background: var(--mrnp-admin-canvas);
   min-height: 34rem;
+  min-width: 0;
   padding: 1.5rem clamp(1rem, 4vw, 4rem) 3rem;
 }
 

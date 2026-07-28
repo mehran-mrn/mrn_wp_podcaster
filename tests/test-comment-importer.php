@@ -6,7 +6,7 @@
  */
 
 define( 'ABSPATH', __DIR__ );
-define( 'MRNP_VERSION', '0.2.5' );
+define( 'MRNP_VERSION', '0.2.6' );
 
 if ( ! function_exists( '__' ) ) {
 	function __( string $text ): string {
